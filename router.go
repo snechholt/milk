@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-type HandlerFunc func(c Context) error
+type HandlerFunc func(c *Context) error
 
 type CreateContextFn func(r *http.Request) appengine.Context
 
