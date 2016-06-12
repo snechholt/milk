@@ -1,14 +1,15 @@
 package api
 
 import (
-	"appengine"
 	"github.com/julienschmidt/httprouter"
+	"golang.org/x/net/context"
+	"google.golang.org/appengine"
 	"net/http"
 )
 
 type HandlerFunc func(c *Context) error
 
-type CreateContextFn func(r *http.Request) appengine.Context
+type CreateContextFn func(r *http.Request) context.Context
 
 type Router struct {
 	CreateContext CreateContextFn
@@ -30,7 +31,7 @@ func NewRouter() *Router {
 	r.NotFound = new(notfound)
 	r.MethodNotAllowed = new(notfound)
 	return &Router{
-		CreateContext: func(r *http.Request) appengine.Context { return appengine.NewContext(r) },
+		CreateContext: func(r *http.Request) context.Context { return appengine.NewContext(r) },
 		r:             r,
 	}
 }
@@ -52,7 +53,7 @@ func (this *Router) middleware() []HandlerFunc {
 	return fns
 }
 
-func (this *Router) createContext(r *http.Request) appengine.Context {
+func (this *Router) createContext(r *http.Request) context.Context {
 	if this.CreateContext != nil {
 		return this.CreateContext(r)
 	} else if this.parent != nil {

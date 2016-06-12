@@ -1,11 +1,11 @@
 package api
 
 import (
-	"appengine"
 	"bytes"
 	"encoding/json"
 	"fmt"
 	"github.com/julienschmidt/httprouter"
+	"golang.org/x/net/context"
 	"io/ioutil"
 	"net/http"
 )
@@ -33,7 +33,7 @@ func (this Errors) Error() string {
 }
 
 type Context struct {
-	appengine.Context
+	context.Context
 
 	// R is the original http request object of the handler
 	R *http.Request
@@ -58,7 +58,7 @@ type Context struct {
 	errs Errors
 }
 
-func newContext(c appengine.Context, r *http.Request, w http.ResponseWriter, p httprouter.Params, handlers []HandlerFunc) *Context {
+func newContext(c context.Context, r *http.Request, w http.ResponseWriter, p httprouter.Params, handlers []HandlerFunc) *Context {
 	rw := &responseWriter{w: w}
 	return &Context{
 		Context:  c,
@@ -77,7 +77,6 @@ func (this *Context) ParseBody(dst interface{}) error {
 		return fmt.Errorf("error reading request body: %v", err)
 	} else {
 		if err = json.Unmarshal(b, dst); err != nil {
-			this.Debugf("Error unmashalling body: %v", err)
 			return ErrBadRequest
 		} else {
 			return nil
@@ -182,7 +181,6 @@ func (this *Context) respond() {
 	w.Header().Set("Content-Type", "application/json")
 	if this.Result != nil {
 		if b, err := json.Marshal(this.Result); err != nil {
-			this.Errorf("json.Marshal error of response body: %v", err)
 			w.WriteHeader(http.StatusInternalServerError)
 		} else {
 			w.WriteHeader(statusCode)
@@ -196,7 +194,7 @@ func (this *Context) respond() {
 // responseWriter wraps a http.ResponseWriter and tracks whether or not Write() or WriteHeader() has been called
 type responseWriter struct {
 	w       http.ResponseWriter
-	written bool // written indicates
+	written bool
 }
 
 func (this *responseWriter) Header() http.Header {
