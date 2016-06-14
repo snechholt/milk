@@ -3,7 +3,6 @@ package api
 import (
 	"github.com/julienschmidt/httprouter"
 	"golang.org/x/net/context"
-	"google.golang.org/appengine"
 	"net/http"
 )
 
@@ -31,7 +30,7 @@ func NewRouter() *Router {
 	r.NotFound = new(notfound)
 	r.MethodNotAllowed = new(notfound)
 	return &Router{
-		CreateContext: func(r *http.Request) context.Context { return appengine.NewContext(r) },
+		CreateContext: func(r *http.Request) context.Context { return context.Background() },
 		r:             r,
 	}
 }
