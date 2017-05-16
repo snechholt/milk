@@ -14,11 +14,22 @@ var DateFormat = "2006-01-02"
 type Params struct {
 	r *http.Request
 	p httprouter.Params
+	o map[string]string
+}
+
+func (this *Params) Override(key string, value string) {
+	if this.o == nil {
+		this.o = make(map[string]string)
+	}
+	this.o[key] = value
 }
 
 // Get returns the given key's value from the request path parameters or querystring.
 // The request path is searched first and overrides any querystring values with the same key.
 func (this *Params) Get(key string) string {
+	if val, ok := this.o[key]; ok {
+		return val
+	}
 	if val := this.p.ByName(key); val != "" {
 		return val
 	} else {
