@@ -10,6 +10,12 @@ import (
 	"net/http"
 )
 
+type Event int
+
+const (
+	OnResponseCompleted Event = iota
+)
+
 // Errors holds one or more errors returned by the handler functions executed on the context.
 // The errors are arranged ordered by when they occured.
 type Errors []error
@@ -56,6 +62,8 @@ type Context struct {
 	index    int           // index is the index of the current handler being processed in the handlers slice
 
 	errs Errors
+
+	events map[Event][]func(*Context)
 }
 
 func newContext(c context.Context, r *http.Request, w http.ResponseWriter, p httprouter.Params, handlers []HandlerFunc) *Context {
@@ -68,6 +76,7 @@ func newContext(c context.Context, r *http.Request, w http.ResponseWriter, p htt
 		Values:   make(map[interface{}]interface{}),
 		w:        rw,
 		handlers: handlers,
+		events:   make(map[Event][]func(*Context)),
 	}
 }
 
@@ -82,6 +91,10 @@ func (this *Context) ParseBody(dst interface{}) error {
 			return nil
 		}
 	}
+}
+
+func (this *Context) OnEvent(event Event, fn func(*Context)) {
+	this.events[event] = append(this.events[event], fn)
 }
 
 // Err() returns any errors returned by the handlers
@@ -188,6 +201,9 @@ func (this *Context) respond() {
 		}
 	} else {
 		w.WriteHeader(statusCode)
+	}
+	for _, fn := range this.events[OnResponseCompleted] {
+		fn(this)
 	}
 }
 
