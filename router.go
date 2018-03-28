@@ -1,8 +1,8 @@
 package api
 
 import (
+	"context"
 	"github.com/julienschmidt/httprouter"
-	"golang.org/x/net/context"
 	"net/http"
 )
 

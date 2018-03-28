@@ -2,10 +2,10 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/julienschmidt/httprouter"
-	"golang.org/x/net/context"
 	"io/ioutil"
 	"net/http"
 )
