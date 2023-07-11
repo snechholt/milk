@@ -1,4 +1,4 @@
-package api
+package milk
 
 type Values map[interface{}]interface{}
 

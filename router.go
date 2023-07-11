@@ -1,4 +1,4 @@
-package api
+package milk
 
 import (
 	"context"

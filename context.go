@@ -1,4 +1,4 @@
-package api
+package milk
 
 import (
 	"bytes"
@@ -140,7 +140,7 @@ func (this *Context) Next() {
 //	c.Next() // the next handler calls c.Stop()
 //	c.Debugf("Hello") // this will still get called
 //	return nil
-//}
+// }
 func (this *Context) Stop() {
 	this.index = len(this.handlers)
 }
